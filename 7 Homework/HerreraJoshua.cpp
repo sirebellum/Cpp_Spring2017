@@ -89,6 +89,12 @@ void treeInsert(TreeNode * &root, const string newItem) {
   }
 }  // end treeInsert()
 
+
+
+/* Joshua Herrera
+   Homework 7 */
+//Beginning of student code
+
 void printTree(TreeNode * cur) {
 	if (cur != NULL) {
 		printTree(cur->left);
@@ -97,15 +103,18 @@ void printTree(TreeNode * cur) {
 } // end printTree()
 
 TreeNode * searchTree(TreeNode * cur, string item) {
+	
 	TreeNode * result = NULL;
+	
 	if (cur != NULL) {
 		if (cur->item == item) return cur;
+		
 		result = searchTree(cur->left, item);
 		if (result != NULL) return result;
+		
 		result = searchTree(cur->right, item); }
 	
 	return result;
-	
 } // end searchTree()
 
 int main(){
