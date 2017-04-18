@@ -130,7 +130,11 @@ public:
 		for (int i = 0; i<=8; i++) {
 			for (int j = 0; j<=8; j++)
 			{
-				if (this->rows[i].Data[j]->data < 0)
+				if (j == 0)
+					//Fixes misalignment when first item in row is negative
+					cout << " "; 
+				if (this->rows[i].Data[j]->data < 0) 
+					//Fixes misalignment when any item is negative
 					cout << "\b" << this->rows[i].Data[j]->data;
 				else
 					cout << this->rows[i].Data[j]->data;
@@ -142,7 +146,7 @@ public:
 			}
 			cout << endl;
 			if (i == 2 || i == 5)
-				cout << "---------------------" << endl;
+				cout << "-----------------------" << endl;
 		}
 	}
 	//Fill in 1s where definite
@@ -340,7 +344,7 @@ public:
 			filled+= this->l7->fill(base);
 			filled+= this->l8->fill(base);
 			filled+= this->l9->fill(base);
-
+			cout << filled << endl;
 			this->populate();
 		}
 	}
@@ -363,12 +367,12 @@ public:
 int main()
 {
 	
-	Board main("sudoku1.txt");
+	Board main("sudoku2.txt");
 	
 	main.base->print();
 	cout << endl;
 	main.extrapolate();
 	main.fill_all();
 	main.populate();
-	main.base->print();
+	main.print_all();
 }
