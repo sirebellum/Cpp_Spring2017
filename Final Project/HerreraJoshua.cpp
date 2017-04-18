@@ -81,6 +81,7 @@ public:
 			}
 		}
 	}
+	
 	//0 out unfillable items
 	void clean(const Layer* base)
 	{
@@ -124,6 +125,7 @@ public:
 			block = false;	
 		}
 	}
+	
 	//Print layer with formatting
 	void print()
 	{
@@ -149,6 +151,7 @@ public:
 				cout << "-----------------------" << endl;
 		}
 	}
+	
 	//Fill in 1s where definite
 	int fill(const Layer* base)
 	{
@@ -199,6 +202,7 @@ public:
 		
 		return filled;
 	}
+	
 	//Fill base board with determined 1s in other layers
 	void populate_base(const Layer* l)
 	{
@@ -210,6 +214,37 @@ public:
 					this->rows[r].Data[i]->data = l->identifier;
 			}
 		}
+	}
+	
+	//Function that is called when base isn't fully populated, but there are still unknowns. Returns 1 if something reserved. Returns 0 if nothing found.
+	int big_guns(Layer* _layer)
+	{
+		int blocksum = 0;
+		
+		for (int b = 0; b <= 8; b++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				blocksum+= this->blocks[b].Data[i]->data;
+			}
+			
+			if (blocksum == -2)
+				if (compare_guns(b, _layer))
+					return b;
+			blocksum = 0;
+		}
+		return 0;
+	}
+	
+	//Function that compares blocks to see if they are missing the same items
+	int compare_guns(int block, Layer* _layer)
+	{
+		int compare = 1;
+		for (int i = 0; i <= 8; i++)
+			compare+= (this->blocks[block].Data[i]->data - _layer->blocks[block].Data[i]->data);
+		if (compare)
+			return 1;
+		else
+			return 0;
 	}
 	
 }; //End Layer
@@ -283,6 +318,7 @@ public:
 			}
 		}
 	}
+	
 	//Extrapolate base layer into layers 1-9
 	void extrapolate()
 	{
@@ -305,6 +341,7 @@ public:
 		l8->clean(base);
 		l9->clean(base);
 	}
+	
 	//Prints all boards with formating
 	void print_all()
 	{
@@ -328,6 +365,7 @@ public:
 		l9->print();
 		cout << endl;
 	}
+	
 	//Fill all layers till nothing can be filled
 	void fill_all()
 	{
@@ -344,10 +382,11 @@ public:
 			filled+= this->l7->fill(base);
 			filled+= this->l8->fill(base);
 			filled+= this->l9->fill(base);
-			cout << filled << endl;
+
 			this->populate();
 		}
 	}
+	
 	//Populates base board
 	void populate()
 	{
@@ -369,10 +408,9 @@ int main()
 	
 	Board main("sudoku2.txt");
 	
-	main.base->print();
 	cout << endl;
 	main.extrapolate();
 	main.fill_all();
 	main.populate();
-	main.print_all();
+	main.l3->big_guns(main.l7);
 }
