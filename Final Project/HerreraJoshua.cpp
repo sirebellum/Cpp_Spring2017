@@ -16,7 +16,7 @@ public:
 	
 	void link(int i, item *data)
 	{
-		delete Data[i]; 
+		if (Data[i] != NULL) delete Data[i]; 
 		Data[i] = data; //Delete old reference and point to new item
 	}
 	
@@ -82,7 +82,7 @@ public:
 		}
 	}
 	//0 out unfillable items
-	void clean()
+	void clean(const Layer* base)
 	{
 		bool row = false;
 		bool column = false;
@@ -93,11 +93,15 @@ public:
 			{
 				if (this->rows[r].Data[i]->data == 1)
 					row = true;
+				if (base->rows[r].Data[i]->data != 0 && base->rows[r].Data[i]->data != this->identifier)
+					this->rows[r].Data[i]->data = 0;
+				
 				if (this->columns[r].Data[i]->data == 1)
 					column = true;
+				
 				if (this->blocks[r].Data[i]->data == 1)
 					block = true;
-				//Comes back true if atleast one item in Unit is already a 1
+				//Comes back true if atleast one item in Unit is already a 1. 0 out full items
 			}
 			
 			if (row)
@@ -140,7 +144,7 @@ public:
 		}
 	}
 	//Fill in 1s where definite
-	int fill()
+	int fill(const Layer* base)
 	{
 		int row = 0;
 		int column = 0;
@@ -159,7 +163,7 @@ public:
 						this->rows[r].Data[i]->data = 1; }
 			row = 0;
 		}
-		this->clean();
+		this->clean(base);
 			
 		for (int r = 0; r <= 8; r++)
 		{
@@ -172,7 +176,7 @@ public:
 						this->columns[r].Data[i]->data = 1; }
 			column = 0;
 		}
-		this->clean();
+		this->clean(base);
 				
 		for (int r = 0; r <= 8; r++)
 		{
@@ -185,9 +189,21 @@ public:
 						this->blocks[r].Data[i]->data = 1; }
 			block = 0;
 		}
-		this->clean();
+		this->clean(base);
 		
 		return filled;
+	}
+	//Fill base board with determined 1s in other layers
+	void populate_base(const Layer* l)
+	{
+		for (int r = 0; r <= 8; r++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				if (l->rows[r].Data[i]->data == 1)
+				//Rows
+					this->rows[r].Data[i]->data = l->identifier;
+			}
+		}
 	}
 	
 }; //End Layer
@@ -223,8 +239,43 @@ public:
 				if (!(iss >> this->base->rows[i].Data[j]->data)) { break; } // error
 			i++;
 		}
-		
-		
+		//Link rows to columns and blocks
+		for (int r = 0; r <= 8; r++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				//Columns
+				this->base->columns[i].link(r, this->base->rows[r].Data[i]);
+				
+				//Blocks
+				if (r <= 2)
+				{
+					if (i <= 2)
+						this->base->blocks[0].link(i+3*r, this->base->rows[r].Data[i]);
+					else if (i >= 3 && i <= 5)
+						this->base->blocks[1].link(i-3+3*r, this->base->rows[r].Data[i]);
+					else
+						this->base->blocks[2].link(i-6+3*r, this->base->rows[r].Data[i]);
+				}
+				else if (r >= 3 && r <= 5)
+				{
+					if (i <= 2)
+						this->base->blocks[3].link(i+3*(r-3), this->base->rows[r].Data[i]);
+					else if (i >= 3 && i <= 5)
+						this->base->blocks[4].link(i-3+3*(r-3), this->base->rows[r].Data[i]);
+					else
+					this->base->blocks[5].link(i-6+3*(r-3), this->base->rows[r].Data[i]);
+				}
+				else
+				{
+					if (i <= 2)
+						this->base->blocks[6].link(i+3*(r-6), this->base->rows[r].Data[i]);
+					else if (i >= 3 && i <= 5)
+						this->base->blocks[7].link(i-3+3*(r-6), this->base->rows[r].Data[i]);
+					else
+						this->base->blocks[8].link(i-6+3*(r-6), this->base->rows[r].Data[i]);
+				}
+			}
+		}
 	}
 	//Extrapolate base layer into layers 1-9
 	void extrapolate()
@@ -238,15 +289,15 @@ public:
 		l7->populate(base);
 		l8->populate(base);
 		l9->populate(base);
-		l1->clean();
-		l2->clean();
-		l3->clean();
-		l4->clean();
-		l5->clean();
-		l6->clean();
-		l7->clean();
-		l8->clean();
-		l9->clean();
+		l1->clean(base);
+		l2->clean(base);
+		l3->clean(base);
+		l4->clean(base);
+		l5->clean(base);
+		l6->clean(base);
+		l7->clean(base);
+		l8->clean(base);
+		l9->clean(base);
 	}
 	//Prints all boards with formating
 	void print_all()
@@ -278,17 +329,30 @@ public:
 		while (filled)
 		{
 			filled = 0;
-			filled+= this->l1->fill();
-			filled+= this->l2->fill();
-			filled+= this->l3->fill();
-			filled+= this->l4->fill();
-			filled+= this->l5->fill();
-			filled+= this->l6->fill();
-			filled+= this->l7->fill();
-			filled+= this->l8->fill();
-			filled+= this->l9->fill();
+			filled+= this->l1->fill(base);
+			filled+= this->l2->fill(base);
+			filled+= this->l3->fill(base);
+			filled+= this->l4->fill(base);
+			filled+= this->l5->fill(base);
+			filled+= this->l6->fill(base);
+			filled+= this->l7->fill(base);
+			filled+= this->l8->fill(base);
+			filled+= this->l9->fill(base);
 			cout << filled << endl;
 		}
+	}
+	//Populates base board
+	void populate()
+	{
+		this->base->populate_base(l1);
+		this->base->populate_base(l2);
+		this->base->populate_base(l3);
+		this->base->populate_base(l4);
+		this->base->populate_base(l5);
+		this->base->populate_base(l6);
+		this->base->populate_base(l7);
+		this->base->populate_base(l8);
+		this->base->populate_base(l9);
 	}
 };
 
@@ -298,9 +362,9 @@ int main()
 	
 	Board main("sudoku1.txt");
 	
+	main.base->print();
+	
 	main.extrapolate();
-	
 	main.fill_all();
-	
 	main.print_all();
 }
