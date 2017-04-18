@@ -16,8 +16,8 @@ public:
 	
 	void link(int i, item *data)
 	{
-		delete Data[i];
-		Data[i] = data;
+		delete Data[i]; 
+		Data[i] = data; //Delete old reference and point to new item
 	}
 	
 }; //End Unit
@@ -42,10 +42,13 @@ public:
 			for (int i = 0; i <= 8; i++)
 			{
 				if (base->rows[r].Data[i]->data == this->identifier)
+				//Rows
 					this->rows[r].Data[i]->data = 1;
-
+				
+				//Columns
 				this->columns[i].link(r, this->rows[r].Data[i]);
 				
+				//Blocks
 				if (r <= 2)
 				{
 					if (i <= 2)
@@ -92,17 +95,18 @@ public:
 					column = true;
 				if (this->blocks[r].Data[i]->data == 1)
 					block = true;
+				//Comes back true if atleast one item in Unit is already a 1
 			}
 			
-			if (row) //If there was eight -1s and one 1
+			if (row)
 				for (int i = 0; i <= 8; i++)
 					if (this->rows[r].Data[i]->data == -1)
 						this->rows[r].Data[i]->data = 0;
-			if (column) //If there was eight -1s and one 1
+			if (column)
 				for (int i = 0; i <= 8; i++)
 					if (this->columns[r].Data[i]->data == -1)
 						this->columns[r].Data[i]->data = 0;
-			if (block) //If there was eight -1s and one 1
+			if (block)
 				for (int i = 0; i <= 8; i++)
 					if (this->blocks[r].Data[i]->data == -1)
 						this->blocks[r].Data[i]->data = 0;
@@ -170,7 +174,6 @@ public:
 		
 		
 	}
-
 	//Extrapolate base layer into layers 1-9
 	void extrapolate()
 	{
