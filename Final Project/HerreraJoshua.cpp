@@ -4,16 +4,17 @@
 #include <fstream>
 using namespace std;
 
-class item {
+class item { //Refers to individual cells in a 9x9 sudoku board
 public:
 	int data = -1;
 }; //End item
 
-class Unit {
+class Unit { //General class encompasing rows, columns, and blocks
 public:
 
 	item* Data[9] = { new item, new item, new item, new item, new item, new item, new item, new item, new item };
 	
+	//Function used to point Unit Data item pointer to other items
 	void link(int i, item *data)
 	{
 		if (Data[i] != NULL) delete Data[i]; 
@@ -22,7 +23,7 @@ public:
 	
 }; //End Unit
 
-class Layer
+class Layer //Class that contains Units of items, where Units are organized into rows, columns, and blocks. Includes an identifier that describes what data the Layer holds. 0 is base, 1 is 1s, 2 is 2s, etc.
 {
 	
 public:
@@ -44,9 +45,8 @@ public:
 				if (base->rows[r].Data[i]->data == this->identifier)
 				//Rows
 					this->rows[r].Data[i]->data = 1;
-				else if (base->rows[r].Data[i]->data != 0)
-					this->rows[r].Data[i]->data = 0;
 				
+			//Next code block links column Units' items and block Units' items to corresponding items in row Units
 				//Columns
 				this->columns[i].link(r, this->rows[r].Data[i]);
 				
@@ -91,9 +91,10 @@ public:
 		for (int r = 0; r <= 8; r++) {
 			for (int i = 0; i <= 8; i++)
 			{
-			//Variable for each Unit comes back true if atleast one item in Unit is already a 1. 0s out items that already have a number in the base Layer
+			//Variable for each Unit comes back true if one item in Unit is already a 1
 				if (this->rows[r].Data[i]->data == 1)
 					row = true;
+				//0 out items that already have a value in base layer
 				if (base->rows[r].Data[i]->data != 0 && base->rows[r].Data[i]->data != this->identifier)
 					this->rows[r].Data[i]->data = 0;
 				
