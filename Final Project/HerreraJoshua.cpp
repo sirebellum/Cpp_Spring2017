@@ -46,6 +46,9 @@ public:
 
 				this->columns[i].link(r, this->rows[r].Data[i]);
 				
+				if (2-i >= 0)
+				this->blocks[i].link(r, this->rows[r].Data[i]);
+				
 			}
 		}
 	}
@@ -66,8 +69,6 @@ public:
 				if (this->blocks[r].Data[i]->data == 1)
 					block = true;
 			}
-			
-			cout << row << column << block << endl;
 			
 			if (row) //If there was eight -1s and one 1
 				for (int i = 0; i <= 8; i++)
@@ -134,12 +135,9 @@ public:
 
 		while (getline(infile, line)) {
 			
-			cout << "reading line" << endl;
-			
 			istringstream iss(line);
-			for (int j = 0; j<=8; j++) {
+			for (int j = 0; j<=8; j++)
 				if (!(iss >> this->base->rows[i].Data[j]->data)) { break; } // error
-				cout << j << endl; }
 			i++;
 		}
 		
@@ -158,6 +156,15 @@ public:
 		l7->populate(base);
 		l8->populate(base);
 		l9->populate(base);
+		l1->clean();
+		l2->clean();
+		l3->clean();
+		l4->clean();
+		l5->clean();
+		l6->clean();
+		l7->clean();
+		l8->clean();
+		l9->clean();
 	}
 };
 
@@ -168,10 +175,7 @@ int main()
 	Board main("sudoku1.txt");
 	
 	main.extrapolate();
-	
 
-	main.l1->clean();
-
-	main.l1->print();
+	main.l2->print();
 	
 }
