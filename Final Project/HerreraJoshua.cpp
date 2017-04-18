@@ -46,33 +46,33 @@ public:
 
 				this->columns[i].link(r, this->rows[r].Data[i]);
 				
-				
-				if (i <= 2 && r <= 2)
-					this->blocks[0].link(i+3*r, this->rows[r].Data[i]);
-				
-				else if ((i >= 3 && i <= 5) && r <= 2)
-					this->blocks[1].link(i-3+3*r, this->rows[r].Data[i]);
-				
-				else if ((i >= 6 && i <= 8) && r <= 2)
-					this->blocks[2].link(i-6+3*r, this->rows[r].Data[i]);
-				
-				else if (i <= 2 && (r >= 3 && r <= 5))
-					this->blocks[3].link(i+3*(r-3), this->rows[r].Data[i]);
-				
-				else if ((i >= 3 && i <= 5) && (r >= 3 && r <= 5))
-					this->blocks[4].link(i-3+3*(r-3), this->rows[r].Data[i]);
-				
-				else if ((i >= 6 && i <= 8) && (r >= 3 && r <= 5))
-					this->blocks[5].link(i-6+3*(r-3), this->rows[r].Data[i]);
-				
-				else if (i <= 2 && r >= 6)
-					this->blocks[6].link(i+3*(r-6), this->rows[r].Data[i]);
-				
-				else if ((i >= 3 && i <= 5) && r >= 6)
-					this->blocks[7].link(i-3+3*(r-6), this->rows[r].Data[i]);
-				
-				else if ((i >= 3 && i <= 5) && r >= 6)
-					this->blocks[8].link(i-6+3*(r-6), this->rows[r].Data[i]);
+				if (r <= 2)
+				{
+					if (i <= 2)
+						this->blocks[0].link(i+3*r, this->rows[r].Data[i]);
+					else if (i >= 3 && i <= 5)
+						this->blocks[1].link(i-3+3*r, this->rows[r].Data[i]);
+					else
+						this->blocks[2].link(i-6+3*r, this->rows[r].Data[i]);
+				}
+				else if (r >= 3 && r <= 5)
+				{
+					if (i <= 2)
+						this->blocks[3].link(i+3*(r-3), this->rows[r].Data[i]);
+					else if (i >= 3 && i <= 5)
+						this->blocks[4].link(i-3+3*(r-3), this->rows[r].Data[i]);
+					else
+						this->blocks[5].link(i-6+3*(r-3), this->rows[r].Data[i]);
+				}
+				else
+				{
+					if (i <= 2)
+						this->blocks[6].link(i+3*(r-6), this->rows[r].Data[i]);
+					else if (i >= 3 && i <= 5)
+						this->blocks[7].link(i-3+3*(r-6), this->rows[r].Data[i]);
+					else
+						this->blocks[8].link(i-6+3*(r-6), this->rows[r].Data[i]);
+				}
 			}
 		}
 	}
