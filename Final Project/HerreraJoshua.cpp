@@ -44,6 +44,8 @@ public:
 				if (base->rows[r].Data[i]->data == this->identifier)
 				//Rows
 					this->rows[r].Data[i]->data = 1;
+				else if (base->rows[r].Data[i]->data != 0)
+					this->rows[r].Data[i]->data = 0;
 				
 				//Columns
 				this->columns[i].link(r, this->rows[r].Data[i]);
@@ -146,34 +148,45 @@ public:
 		
 		int filled = 0;
 		//Sum up totals in each Unit
-		for (int r = 0; r <= 8; r++) {
+		for (int r = 0; r <= 8; r++)
+		{
 			for (int i = 0; i <= 8; i++)
-			{
 				row+=    this->rows[r].Data[i]->data;
-				column+= this->columns[r].Data[i]->data;
-				block+=  this->blocks[r].Data[i]->data;
-			}
-			
 			if (row == -1) {
 				filled = 1;
 				for (int i = 0; i <= 8; i++)
 					if (this->rows[r].Data[i]->data == -1)
 						this->rows[r].Data[i]->data = 1; }
+			row = 0;
+		}
+		this->clean();
+			
+		for (int r = 0; r <= 8; r++)
+		{
+			for (int i = 0; i <= 8; i++)
+				column+= this->columns[r].Data[i]->data;
 			if (column == -1) {
 				filled = 1;
 				for (int i = 0; i <= 8; i++)
 					if (this->columns[r].Data[i]->data == -1)
 						this->columns[r].Data[i]->data = 1; }
+			column = 0;
+		}
+		this->clean();
+				
+		for (int r = 0; r <= 8; r++)
+		{
+			for (int i = 0; i <= 8; i++)
+				block+=  this->blocks[r].Data[i]->data;
 			if (block == -1) {
 				filled = 1;
 				for (int i = 0; i <= 8; i++)
 					if (this->blocks[r].Data[i]->data == -1)
 						this->blocks[r].Data[i]->data = 1; }
-			
-			row = 0;
-			column = 0;
-			block = 0;	
+			block = 0;
 		}
+		this->clean();
+		
 		return filled;
 	}
 	
@@ -235,6 +248,48 @@ public:
 		l8->clean();
 		l9->clean();
 	}
+	//Prints all boards with formating
+	void print_all()
+	{
+		cout << "LAYER 1" << endl;
+		l1->print();
+		cout << endl << "LAYER 2" << endl;
+		l2->print();
+		cout << endl << "LAYER 3" << endl;
+		l3->print();
+		cout << endl << "LAYER 4" << endl;
+		l4->print();
+		cout << endl << "LAYER 5" << endl;
+		l5->print();
+		cout << endl << "LAYER 6" << endl;
+		l6->print();
+		cout << endl << "LAYER 7" << endl;
+		l7->print();
+		cout << endl << "LAYER 8" << endl;
+		l8->print();
+		cout << endl << "LAYER 9" << endl;
+		l9->print();
+		cout << endl;
+	}
+	//Fill all layers till nothing can be filled
+	void fill_all()
+	{
+		int filled = 1;
+		while (filled)
+		{
+			filled = 0;
+			filled+= this->l1->fill();
+			filled+= this->l2->fill();
+			filled+= this->l3->fill();
+			filled+= this->l4->fill();
+			filled+= this->l5->fill();
+			filled+= this->l6->fill();
+			filled+= this->l7->fill();
+			filled+= this->l8->fill();
+			filled+= this->l9->fill();
+			cout << filled << endl;
+		}
+	}
 };
 
 
@@ -245,13 +300,7 @@ int main()
 	
 	main.extrapolate();
 	
-	cout << main.l1->fill() << endl;
-	cout << main.l2->fill() << endl;
-	cout << main.l3->fill() << endl;
-	cout << main.l4->fill() << endl;
-	cout << main.l5->fill() << endl;
-	cout << main.l6->fill() << endl;
-	cout << main.l7->fill() << endl;
-	cout << main.l8->fill() << endl;
-	cout << main.l9->fill() << endl;
+	main.fill_all();
+	
+	main.print_all();
 }
