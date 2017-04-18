@@ -91,6 +91,7 @@ public:
 		for (int r = 0; r <= 8; r++) {
 			for (int i = 0; i <= 8; i++)
 			{
+			//Variable for each Unit comes back true if atleast one item in Unit is already a 1. 0s out items that already have a number in the base Layer
 				if (this->rows[r].Data[i]->data == 1)
 					row = true;
 				if (base->rows[r].Data[i]->data != 0 && base->rows[r].Data[i]->data != this->identifier)
@@ -101,7 +102,7 @@ public:
 				
 				if (this->blocks[r].Data[i]->data == 1)
 					block = true;
-				//Comes back true if atleast one item in Unit is already a 1. 0 out full items
+				
 			}
 			
 			if (row)
@@ -338,7 +339,8 @@ public:
 			filled+= this->l7->fill(base);
 			filled+= this->l8->fill(base);
 			filled+= this->l9->fill(base);
-			cout << filled << endl;
+
+			this->populate();
 		}
 	}
 	//Populates base board
@@ -363,8 +365,9 @@ int main()
 	Board main("sudoku1.txt");
 	
 	main.base->print();
-	
+	cout << endl;
 	main.extrapolate();
 	main.fill_all();
-	main.print_all();
+	main.populate();
+	main.base->print();
 }
