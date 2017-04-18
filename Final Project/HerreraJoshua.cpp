@@ -137,6 +137,45 @@ public:
 				cout << "---------------------" << endl;
 		}
 	}
+	//Fill in 1s where definite
+	int fill()
+	{
+		int row = 0;
+		int column = 0;
+		int block = 0;
+		
+		int filled = 0;
+		//Sum up totals in each Unit
+		for (int r = 0; r <= 8; r++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				row+=    this->rows[r].Data[i]->data;
+				column+= this->columns[r].Data[i]->data;
+				block+=  this->blocks[r].Data[i]->data;
+			}
+			
+			if (row == -1) {
+				filled = 1;
+				for (int i = 0; i <= 8; i++)
+					if (this->rows[r].Data[i]->data == -1)
+						this->rows[r].Data[i]->data = 1; }
+			if (column == -1) {
+				filled = 1;
+				for (int i = 0; i <= 8; i++)
+					if (this->columns[r].Data[i]->data == -1)
+						this->columns[r].Data[i]->data = 1; }
+			if (block == -1) {
+				filled = 1;
+				for (int i = 0; i <= 8; i++)
+					if (this->blocks[r].Data[i]->data == -1)
+						this->blocks[r].Data[i]->data = 1; }
+			
+			row = 0;
+			column = 0;
+			block = 0;	
+		}
+		return filled;
+	}
 	
 }; //End Layer
 
@@ -205,6 +244,14 @@ int main()
 	Board main("sudoku1.txt");
 	
 	main.extrapolate();
-
-	main.l1->print();
+	
+	cout << main.l1->fill() << endl;
+	cout << main.l2->fill() << endl;
+	cout << main.l3->fill() << endl;
+	cout << main.l4->fill() << endl;
+	cout << main.l5->fill() << endl;
+	cout << main.l6->fill() << endl;
+	cout << main.l7->fill() << endl;
+	cout << main.l8->fill() << endl;
+	cout << main.l9->fill() << endl;
 }
