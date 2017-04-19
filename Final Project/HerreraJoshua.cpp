@@ -530,8 +530,9 @@ public:
 			this->uns();
 			this->populate();
 			this->fill_all();
+			system("cls");
+			print_base();
 		}
-		print_base();
 	}
 }; //End Board
 
