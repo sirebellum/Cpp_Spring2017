@@ -32,6 +32,9 @@ public:
 	Unit* columns = new Unit[9];
 	Unit* blocks  = new Unit[9];
 	int identifier;
+	
+	int guns[9] = {-1};
+	int g = 0;
 
 	//Constructor
 	Layer(int id) {identifier = id; }
@@ -216,8 +219,8 @@ public:
 		}
 	}
 	
-	//Function that is called when base isn't fully populated, but there are still unknowns. Returns 1 if something reserved. Returns 0 if nothing found.
-	int big_guns(Layer* _layer)
+	//Function that is called when base isn't fully populated, but there are still unknowns. Returns block number of reservable items
+	int find_guns(Layer* _layer)
 	{
 		int blocksum = 0;
 		
@@ -232,7 +235,7 @@ public:
 					return b;
 			blocksum = 0;
 		}
-		return 0;
+		return -1;
 	}
 	
 	//Function that compares blocks to see if they are missing the same items
@@ -240,11 +243,24 @@ public:
 	{
 		int compare = 1;
 		for (int i = 0; i <= 8; i++)
-			compare+= (this->blocks[block].Data[i]->data - _layer->blocks[block].Data[i]->data);
-		if (compare)
+			if (this->blocks[block].Data[i]->data != _layer->blocks[block].Data[i]->data)
+				compare+= 1;
+		if (compare == 1)
 			return 1;
 		else
 			return 0;
+	}
+	
+	//Function that 0s out reservable items based on blocks from find_guns
+	int big_guns(int block, Layer* _layer)
+	{
+		if (block == -1) return 0;
+		for (int i = 0; i <= 8; i++)
+		{
+			if (this->blocks[block].Data[i]->data == -1)
+				_layer->blocks[block].Data[i]->data = 0;
+		}
+		return 1;
 	}
 	
 }; //End Layer
@@ -265,6 +281,8 @@ public:
 	Layer *l9 = new Layer(9);
 	
 	Layer *base = new Layer(0);
+	
+	Layer* layers[10] = { base, l1, l2, l3, l4, l5, l6, l7, l8, l9};
 	
 	//Constructor
 	Board(string filename)
@@ -382,8 +400,6 @@ public:
 			filled+= this->l7->fill(base);
 			filled+= this->l8->fill(base);
 			filled+= this->l9->fill(base);
-
-			this->populate();
 		}
 	}
 	
@@ -400,17 +416,34 @@ public:
 		this->base->populate_base(l8);
 		this->base->populate_base(l9);
 	}
-};
+
+	void guns()
+	{
+		for (int i = 1; i<=9; i++)
+			for (int j = i+1; j<=9; j++)
+				for (int b = 1; b<=9; b++)
+					if (b != i && b != j)
+						layers[i]->big_guns(layers[i]->find_guns(layers[j]), layers[b]);
+	}
+
+	void print_base()
+	{
+		this->base->print();
+	}
+}; //End Board
 
 
 int main()
 {
 	
-	Board main("sudoku2.txt");
+	Board main("sudoku3.txt");
 	
-	cout << endl;
 	main.extrapolate();
 	main.fill_all();
+	main.guns();
+	
 	main.populate();
-	main.l3->big_guns(main.l7);
+	main.fill_all();
+	
+	main.print_all();
 }
