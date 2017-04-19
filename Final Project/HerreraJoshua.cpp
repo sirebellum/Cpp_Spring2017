@@ -538,18 +538,8 @@ public:
 
 int main()
 {
-	Board main("sudoku2.txt");
+	Board main("sudoku1.txt");
 	
-	main.extrapolate();
-	main.fill_all();
-	
-	for (int i = 0; i<=20; i++)
-	{
-		main.uns();
-		main.populate();
-		main.fill_all();
-	}
-	
-		main.print_all();
+	main.solve();
 	
 }
