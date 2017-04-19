@@ -32,9 +32,6 @@ public:
 	Unit* columns = new Unit[9];
 	Unit* blocks  = new Unit[9];
 	int identifier;
-	
-	int guns[9] = {-1};
-	int g = 0;
 
 	//Constructor
 	Layer(int id) {identifier = id; }
@@ -219,8 +216,8 @@ public:
 		}
 	}
 	
-	//Function that is called when base isn't fully populated, but there are still unknowns. Returns block number of reservable items
-	int find_guns(Layer* _layer)
+	//Function that is called when base isn't fully populated, but there are still unknowns. Returns index number of reservable items
+	int find_buns(Layer* _layer)
 	{
 		int blocksum = 0;
 		
@@ -231,15 +228,49 @@ public:
 			}
 			
 			if (blocksum == -2)
-				if (compare_guns(b, _layer))
+				if (compare_buns(b, _layer))
 					return b;
 			blocksum = 0;
 		}
 		return -1;
 	}
+	int find_runs(Layer* _layer)
+	{
+		int rowsum = 0;
+		
+		for (int b = 0; b <= 8; b++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				rowsum+= this->rows[b].Data[i]->data;
+			}
+			
+			if (rowsum == -2)
+				if (compare_runs(b, _layer))
+					return b;
+			rowsum = 0;
+		}
+		return -1;
+	}
+	int find_cuns(Layer* _layer)
+	{
+		int columnsum = 0;
+		
+		for (int b = 0; b <= 8; b++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				columnsum+= this->columns[b].Data[i]->data;
+			}
+			
+			if (columnsum == -2)
+				if (compare_cuns(b, _layer))
+					return b;
+			columnsum = 0;
+		}
+		return -1;
+	}
 	
 	//Function that compares blocks to see if they are missing the same items
-	int compare_guns(int block, Layer* _layer)
+	int compare_buns(int block, Layer* _layer)
 	{
 		int compare = 1;
 		for (int i = 0; i <= 8; i++)
@@ -250,15 +281,57 @@ public:
 		else
 			return 0;
 	}
+	int compare_runs(int row, Layer* _layer)
+	{
+		int compare = 1;
+		for (int i = 0; i <= 8; i++)
+			if (this->rows[row].Data[i]->data != _layer->rows[row].Data[i]->data)
+				compare+= 1;
+		if (compare == 1)
+			return 1;
+		else
+			return 0;
+	}
+	int compare_cuns(int column, Layer* _layer)
+	{
+		int compare = 1;
+		for (int i = 0; i <= 8; i++)
+			if (this->columns[column].Data[i]->data != _layer->columns[column].Data[i]->data)
+				compare+= 1;
+		if (compare == 1)
+			return 1;
+		else
+			return 0;
+	}
 	
-	//Function that 0s out reservable items based on blocks from find_guns
-	int big_guns(int block, Layer* _layer)
+	//Function that 0s out reservable items based on blocks from find_buns
+	int big_buns(int block, Layer* _layer)
 	{
 		if (block == -1) return 0;
 		for (int i = 0; i <= 8; i++)
 		{
 			if (this->blocks[block].Data[i]->data == -1)
 				_layer->blocks[block].Data[i]->data = 0;
+		}
+		return 1;
+	}
+	int big_runs(int row, Layer* _layer)
+	{
+		if (row == -1) return 0;
+		for (int i = 0; i <= 8; i++)
+		{
+			if (this->rows[row].Data[i]->data == -1)
+				_layer->rows[row].Data[i]->data = 0;
+		}
+		return 1;
+	}
+	int big_cuns(int column, Layer* _layer)
+	{
+		if (column == -1) return 0;
+		for (int i = 0; i <= 8; i++)
+		{
+			if (this->columns[column].Data[i]->data == -1)
+				_layer->columns[column].Data[i]->data = 0;
 		}
 		return 1;
 	}
@@ -417,33 +490,66 @@ public:
 		this->base->populate_base(l9);
 	}
 
-	void guns()
+	//Finds unkowns (uns) that can't be determined with simple methods
+	void uns()
 	{
 		for (int i = 1; i<=9; i++)
 			for (int j = i+1; j<=9; j++)
 				for (int b = 1; b<=9; b++)
 					if (b != i && b != j)
-						layers[i]->big_guns(layers[i]->find_guns(layers[j]), layers[b]);
+					{
+						layers[i]->big_buns(layers[i]->find_buns(layers[j]), layers[b]);
+						layers[i]->big_runs(layers[i]->find_runs(layers[j]), layers[b]);
+						layers[i]->big_cuns(layers[i]->find_cuns(layers[j]), layers[b]);
+					}
 	}
 
 	void print_base()
 	{
 		this->base->print();
 	}
+
+	//Check if board is full
+	bool done()
+	{
+		for (int r = 0; r <= 8; r++)
+			for (int i = 0; i <= 8; i++)
+				if (this->base->rows[r].Data[i]->data == 0)
+					return false;
+		return true;
+	}
+	
+	void solve()
+	{
+		
+		this->extrapolate();
+		this->fill_all();
+		
+		while (!done())
+		{
+			this->uns();
+			this->populate();
+			this->fill_all();
+		}
+		print_base();
+	}
 }; //End Board
 
 
 int main()
 {
-	
-	Board main("sudoku3.txt");
+	Board main("sudoku2.txt");
 	
 	main.extrapolate();
 	main.fill_all();
-	main.guns();
 	
-	main.populate();
-	main.fill_all();
+	for (int i = 0; i<=20; i++)
+	{
+		main.uns();
+		main.populate();
+		main.fill_all();
+	}
 	
-	main.print_all();
+		main.print_all();
+	
 }
