@@ -230,6 +230,7 @@ public:
 			if (blocksum == -2)
 				if (compare_buns(b, _layer))
 					return b;
+				
 			blocksum = 0;
 		}
 		return -1;
@@ -272,36 +273,24 @@ public:
 	//Function that compares blocks to see if they are missing the same items
 	int compare_buns(int block, Layer* _layer)
 	{
-		int compare = 1;
 		for (int i = 0; i <= 8; i++)
 			if (this->blocks[block].Data[i]->data != _layer->blocks[block].Data[i]->data)
-				compare+= 1;
-		if (compare == 1)
-			return 1;
-		else
-			return 0;
+				return 0;
+		return 1;
 	}
 	int compare_runs(int row, Layer* _layer)
 	{
-		int compare = 1;
 		for (int i = 0; i <= 8; i++)
 			if (this->rows[row].Data[i]->data != _layer->rows[row].Data[i]->data)
-				compare+= 1;
-		if (compare == 1)
-			return 1;
-		else
-			return 0;
+				return 0;
+		return 1;
 	}
 	int compare_cuns(int column, Layer* _layer)
 	{
-		int compare = 1;
 		for (int i = 0; i <= 8; i++)
 			if (this->columns[column].Data[i]->data != _layer->columns[column].Data[i]->data)
-				compare+= 1;
-		if (compare == 1)
-			return 1;
-		else
-			return 0;
+				return 0;
+		return 1;
 	}
 	
 	//Function that 0s out reservable items based on blocks from find_buns
