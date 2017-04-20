@@ -290,8 +290,6 @@ public:
 		return -1;
 	}
 	
-	
-	
 	//0s out reservable items based on index from find3_uns, sets 1s, then resets 0s
 	int big3_buns(int block, Layer* _layer)
 	{
