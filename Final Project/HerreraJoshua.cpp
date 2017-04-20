@@ -152,6 +152,34 @@ public:
 		}
 	}
 	
+	void write()
+	{
+		ofstream myfile;
+		string filename = to_string(identifier);
+		filename+= ".txt";
+		myfile.open (filename);
+		
+		for (int i = 0; i<=8; i++) {
+			for (int j = 0; j<=8; j++)
+			{
+				if (this->rows[i].Data[j]->data < 0) 
+					//Fixes misalignment when any item is negative
+					myfile << " ";
+				else
+					myfile << this->rows[i].Data[j]->data;
+				
+				if (j == 2 || j == 5)
+					myfile << " | ";
+				else myfile << " ";
+				
+			}
+			myfile << "\r\n";
+			if (i == 2 || i == 5)
+				myfile << "-----------------------" << "\r\n";
+		}
+		myfile.close();
+	}
+	
 	//Fill in 1s where definite
 	int fill(const Layer* base)
 	{
@@ -457,6 +485,12 @@ public:
 		cout << endl;
 	}
 	
+	void write_all()
+	{
+		for (int i = 0; i <= 9; i++)
+			layers[i]->write();
+	}
+	
 	//Fill all layers till nothing can be filled
 	void fill_all()
 	{
@@ -490,7 +524,7 @@ public:
 		this->base->populate_base(l9);
 	}
 
-	//Finds unkowns (uns) that can't be determined with simple methods
+	//Finds and reserves unkowns (uns) that can't be determined with simple methods
 	void uns()
 	{
 		for (int i = 1; i<=9; i++)
@@ -538,8 +572,34 @@ public:
 
 int main()
 {
-	Board main("sudoku1.txt");
+	Board main("sudoku2.txt");
 	
-	main.solve();
+	main.extrapolate();
+	main.fill_all();
 	
+	for (int i = 0; i<50; i++)
+	{
+		main.uns();
+		main.populate();
+		main.fill_all();
+	}
+	
+	main.print_all();
+	main.write_all();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
