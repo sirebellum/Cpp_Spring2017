@@ -270,6 +270,34 @@ public:
 		return -1;
 	}
 	
+	//When 2 uns isn't enough
+	int find3_buns(Layer* _layer)
+	{
+		int blocksum = 0;
+		
+		for (int b = 0; b <= 8; b++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				blocksum+= this->blocks[b].Data[i]->data;
+			}
+			
+			if (blocksum == -3)
+				if (compare_buns(b, _layer))
+					return b;
+				
+			blocksum = 0;
+		}
+		return -1;
+	}
+	
+	
+	
+	//0s out reservable items based on index from find3_uns, sets 1s, then resets 0s
+	int big3_buns(int block, Layer* _layer)
+	{
+		
+	}
+	
 	//Function that compares blocks to see if they are missing the same items
 	int compare_buns(int block, Layer* _layer)
 	{
@@ -519,8 +547,8 @@ public:
 			this->uns();
 			this->populate();
 			this->fill_all();
-			system("cls");
 			print_base();
+			cout << endl;
 		}
 	}
 }; //End Board
