@@ -216,99 +216,6 @@ public:
 		}
 	}
 	
-	//When 2 uns isn't enough
-	int find3_buns(Layer* _layer)
-	{
-		int blocksum = 0;
-		
-		for (int b = 0; b <= 8; b++) {
-			for (int i = 0; i <= 8; i++)
-			{
-				blocksum+= this->blocks[b].Data[i]->data;
-			}
-			
-			if (blocksum == -3)
-				if (compare_buns(b, _layer))
-					return b;
-				
-			blocksum = 0;
-		}
-		return -1;
-	}
-	int find3_runs(Layer* _layer)
-	{
-		int rowsum = 0;
-		
-		for (int b = 0; b <= 8; b++) {
-			for (int i = 0; i <= 8; i++)
-			{
-				rowsum+= this->rows[b].Data[i]->data;
-			}
-			
-			if (rowsum == -3)
-				if (compare_runs(b, _layer))
-					return b;
-				
-			rowsum = 0;
-		}
-		return -1;
-	}
-	int find3_cuns(Layer* _layer)
-	{
-		int columnsum = 0;
-		
-		for (int b = 0; b <= 8; b++) {
-			for (int i = 0; i <= 8; i++)
-			{
-				columnsum+= this->columns[b].Data[i]->data;
-			}
-			
-			if (columnsum == -3)
-				if (compare_cuns(b, _layer))
-					return b;
-				
-			columnsum = 0;
-		}
-		return -1;
-	}
-	
-	//0s out reservable items based on index from find3_uns, sets 1s, then resets 0s
-	int big3_buns(int block, Layer** _layers)
-	{
-		if (block == -1) return 0;
-		
-		//Keep original Unit data available to reset back to later
-		Unit *orgblocks[9]  = { new Unit, new Unit, new Unit, new Unit, new Unit, new Unit, new Unit, new Unit, new Unit };
-		for (int b = 1; b <= 9; b++)	
-			for (int i = 0; i <= 8; i++)
-			{
-				orgblocks[b-1]->Data[i]->data = _layers[b]->blocks[block].Data[i]->data;
-			}
-		
-		for (int b = 1; b <= 9; b++)
-			for (int i = 0; i <= 8; i++)
-			{
-				if (this->blocks[block].Data[i]->data == -1 && this->identifier != b)
-					_layers[b]->blocks[block].Data[i]->data = 0;
-			}
-		
-		//Run fill routine on temporarily zeroed out items
-		for (int b = 1; b <= 9; b++)
-			_layers[b]->fill(_layers[0]);
-		
-		//Remove temporary zeroes, but not newly found 1s
-		for (int b = 1; b <= 9; b++)
-			for (int i = 0; i <= 8; i++)
-			{
-				if (_layers[b]->blocks[block].Data[i]->data != 1)
-					_layers[b]->blocks[block].Data[i]->data = orgblocks[b-1]->Data[i]->data;
-			}
-		
-		
-		return 1;
-	}
-	
-	
 	//Function that is called when base isn't fully populated, but there are still unknowns. Returns index number of reservable items
 	int find_buns(Layer* _layer)
 	{
@@ -572,16 +479,6 @@ public:
 		this->base->populate_base(l8);
 		this->base->populate_base(l9);
 	}
-
-	//Finds 3 unknowns taht can't determined with uns2 methods
-	void uns3()
-	{
-		for (int i = 1; i<=9; i++)
-			for (int j = i+1; j<=9; j++)
-				{
-					layers[i]->big3_buns(layers[i]->find3_buns(layers[j]), layers);
-				}
-	}
 	
 	//Finds unkowns (uns) that can't be determined with simple methods
 	void uns2()
@@ -640,32 +537,19 @@ public:
 			cout << endl;
 		}
 		
-/*		if (this->sum() != 405)
+		if (this->sum() != 405)
 		{
-			boardsum = 0;
-			
-			while (boardsum != this->sum())
-			{
-			this->uns3();
-			this->populate();
-			this->fill_all();
-			}
+			cout << "Unable to solve with current methods" << endl;
 		}
-*/		
+		
 	}
 }; //End Board
 
 
 int main()
 {
-	Board main("sudoku2.txt");
+	Board main("sudoku1.txt");
 	
 	main.solve();
-	
-	main.uns3();
-	main.populate();
-	main.fill_all();
-	main.print_base();
-	cout << endl;
 	
 }
