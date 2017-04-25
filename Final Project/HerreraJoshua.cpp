@@ -192,7 +192,7 @@ public:
 		for (int r = 0; r <= 8; r++)
 		{
 			for (int i = 0; i <= 8; i++)
-				row+=    this->rows[r].Data[i]->data;
+				row+= this->rows[r].Data[i]->data;
 			if (row == -1) {
 				filled = 1;
 				for (int i = 0; i <= 8; i++)
@@ -258,6 +258,7 @@ public:
 			if (blocksum == -2)
 				if (compare_buns(b, _layer))
 					return b;
+				
 			blocksum = 0;
 		}
 		return -1;
@@ -300,36 +301,24 @@ public:
 	//Function that compares blocks to see if they are missing the same items
 	int compare_buns(int block, Layer* _layer)
 	{
-		int compare = 1;
 		for (int i = 0; i <= 8; i++)
 			if (this->blocks[block].Data[i]->data != _layer->blocks[block].Data[i]->data)
-				compare+= 1;
-		if (compare == 1)
-			return 1;
-		else
-			return 0;
+				return 0;
+		return 1;
 	}
 	int compare_runs(int row, Layer* _layer)
 	{
-		int compare = 1;
 		for (int i = 0; i <= 8; i++)
 			if (this->rows[row].Data[i]->data != _layer->rows[row].Data[i]->data)
-				compare+= 1;
-		if (compare == 1)
-			return 1;
-		else
-			return 0;
+				return 0;
+		return 1;
 	}
 	int compare_cuns(int column, Layer* _layer)
 	{
-		int compare = 1;
 		for (int i = 0; i <= 8; i++)
 			if (this->columns[column].Data[i]->data != _layer->columns[column].Data[i]->data)
-				compare+= 1;
-		if (compare == 1)
-			return 1;
-		else
-			return 0;
+				return 0;
+		return 1;
 	}
 	
 	//Function that 0s out reservable items based on blocks from find_buns
@@ -392,6 +381,7 @@ public:
 		string line;
 		int i = 0;
 
+		//Read sudoku board from file
 		while (getline(infile, line)) {
 			
 			istringstream iss(line);
@@ -553,19 +543,39 @@ public:
 		return true;
 	}
 	
+	//Return sum of board items. Used to check if board has changed
+	int sum()
+	{
+		int sum = 0;
+		for (int r = 0; r <= 8; r++)
+			for (int i = 0; i <= 8; i++)
+				sum += this->base->rows[r].Data[i]->data;
+		return sum;
+	}
+	
 	void solve()
 	{
-		
 		this->extrapolate();
 		this->fill_all();
 		
-		while (!done())
+		int boardsum = 0;
+		
+		while (boardsum != this->sum())
 		{
-			this->uns();
+			boardsum = this->sum();
+			this->uns2();
 			this->populate();
 			this->fill_all();
+			
+			print_base();
+			cout << endl;
 		}
-		print_base();
+		
+		if (this->sum() != 405)
+		{
+			cout << "Unable to solve with current methods" << endl;
+		}
+		
 	}
 }; //End Board
 
