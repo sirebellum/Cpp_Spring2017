@@ -81,6 +81,18 @@ public:
 			}
 		}
 	}
+	//Fill base board with determined 1s in other layers
+	void populate_base(const Layer* l)
+	{
+		for (int r = 0; r <= 8; r++) {
+			for (int i = 0; i <= 8; i++)
+			{
+				if (l->rows[r].Data[i]->data == 1)
+				//Rows
+					this->rows[r].Data[i]->data = l->identifier;
+			}
+		}
+	}
 	
 	//0 out unfillable items
 	void clean(const Layer* base)
@@ -151,7 +163,7 @@ public:
 				cout << "-----------------------" << endl;
 		}
 	}
-	
+	//Write layer to text file with formating
 	void write()
 	{
 		ofstream myfile;
@@ -231,20 +243,7 @@ public:
 		return filled;
 	}
 	
-	//Fill base board with determined 1s in other layers
-	void populate_base(const Layer* l)
-	{
-		for (int r = 0; r <= 8; r++) {
-			for (int i = 0; i <= 8; i++)
-			{
-				if (l->rows[r].Data[i]->data == 1)
-				//Rows
-					this->rows[r].Data[i]->data = l->identifier;
-			}
-		}
-	}
-	
-	//Function that is called when base isn't fully populated, but there are still unknowns. Returns index number of reservable items
+	//Functions that are called when base isn't fully populated, but there are still unknowns. Returns index number of reservable items
 	int find_buns(Layer* _layer)
 	{
 		int blocksum = 0;
@@ -298,7 +297,7 @@ public:
 		return -1;
 	}
 	
-	//Function that compares blocks to see if they are missing the same items
+	//Function that compares Units to see if they are missing the same items
 	int compare_buns(int block, Layer* _layer)
 	{
 		for (int i = 0; i <= 8; i++)
@@ -321,7 +320,7 @@ public:
 		return 1;
 	}
 	
-	//Function that 0s out reservable items based on blocks from find_buns
+	//Function that 0s out reservable items based on index from find_buns
 	int big_buns(int block, Layer* _layer)
 	{
 		if (block == -1) return 0;
@@ -451,7 +450,7 @@ public:
 		l9->clean(base);
 	}
 	
-	//Prints all boards with formating
+	//Prints all Layers with formating
 	void print_all()
 	{
 		cout << "LAYER 1" << endl;
@@ -474,7 +473,11 @@ public:
 		l9->print();
 		cout << endl;
 	}
-	
+	void print_base()
+	{
+		this->base->print();
+	}
+	//Writes all Layers to file with formating
 	void write_all()
 	{
 		for (int i = 0; i <= 9; i++)
@@ -526,11 +529,6 @@ public:
 						layers[i]->big_runs(layers[i]->find_runs(layers[j]), layers[b]);
 						layers[i]->big_cuns(layers[i]->find_cuns(layers[j]), layers[b]);
 					}
-	}
-
-	void print_base()
-	{
-		this->base->print();
 	}
 
 	//Check if board is full
