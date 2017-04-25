@@ -94,6 +94,147 @@ public:
 		}
 	}
 	
+	//Functions that clean rows and columns for block_reserve function based on block composition
+	void block_cclean(int block, int column)
+	{
+		for (int i = 0; i <= 8; i++)
+		{
+			if (block <= 2) {
+				if (i > 2)
+				this->columns[column].Data[i]->data = 0; }
+			else if (block >= 3 && block <= 5) {
+				if (i < 3 || i > 5)
+					this->columns[column].Data[i]->data = 0; }
+			else {
+				if (i < 6)
+					this->columns[column].Data[i]->data = 0; }
+		}
+	}
+	void block_rclean(int block, int row)
+	{
+		
+		if (block <= 2)
+			if (row == 2)
+				row = 0;
+			else if (row == 5)
+				row = 1;
+			else
+				row = 2;
+		else if (block >= 3 && block <= 5)
+			if (row == 2)
+				row = 3;
+			else if (row == 5)
+				row = 4;
+			else
+				row = 5;
+		else 
+			if (row == 2)
+				row = 6;
+			else if (row == 5)
+				row = 7;
+			else
+				row = 8;
+		
+		for (int i = 0; i <= 8; i++)
+		{
+			if (block == 0 || block == 3 || block == 6)
+				if (i > 2)
+				{
+					this->rows[row].Data[i]->data = 0;
+				}
+			else if (block == 1 || block == 4 || block == 7)
+				if (i < 3 && i > 5)
+				{
+					this->rows[row].Data[i]->data = 0;
+				}
+			else
+				if (i < 6)
+				{
+					this->rows[row].Data[i]->data = 0;
+				}
+		}
+	}
+	
+	//Finds blocks whose empty items are aligned in a row or a column and 0s out the row/column outside of the block
+	void block_reserve()
+	{
+		//0s out items in which a 1 would render a block all 0s
+		int bsum = 0;
+		int brsum = 0;
+		int bc1sum = 0;
+		int bc2sum = 0;
+		int bc3sum = 0;
+		for (int b = 0; b <= 8; b++) {
+			for (int i = 0; i <= 8; i++)
+				bsum+= this->blocks[b].Data[i]->data;
+			
+			if (bsum >= -3 && bsum != 1)
+			{
+				for (int i = 0; i <= 8; i++)
+				{
+					//Rows
+					brsum+= this->blocks[b].Data[i]->data;
+					if (i==2 || i==5 || i==8)
+					{
+						if (brsum == bsum)
+							block_rclean(b, i);
+						brsum = 0;
+					}
+					
+					//Columns
+					if (i==0 || i==3 || i==6)
+					{
+						bc1sum+= this->blocks[b].Data[i]->data;
+						if (bc1sum == bsum)
+						{
+							if (b <= 2)
+								block_cclean(b, (3*b));
+							else if (b >= 3 && b <= 5)
+								block_cclean(b, (3*(b-3)));
+							else 
+								block_cclean(b, (3*(b-6)));
+							bc1sum = 0;
+						}
+					}
+					else if (i==1 || i==4 || i==7)
+					{
+						bc2sum+= this->blocks[b].Data[i]->data;
+						if (bc2sum == bsum)
+						{
+							if (b <= 2)
+								block_cclean(b, 1+(3*b));
+							else if (b >= 3 && b <= 5)
+								block_cclean(b, 1+(3*(b-3)));
+							else 
+								block_cclean(b, 1+(3*(b-6)));
+							bc2sum = 0;
+						}
+					}
+					else if (i==2 || i==5 || i==8)
+					{
+						bc3sum+= this->blocks[b].Data[i]->data;
+						if (bc3sum == bsum)
+						{
+							if (b <= 2)
+								block_cclean(b, 2+(3*b));
+							else if (b >= 3 && b <= 5)
+								block_cclean(b, 2+(3*(b-3)));
+							else 
+								block_cclean(b, 2+(3*(b-6)));
+							bc3sum = 0;
+						}
+					}
+				}
+			}
+		
+		brsum = 0;
+		bc1sum = 0;
+		bc2sum = 0;
+		bc3sum = 0;
+		bsum = 0;
+		}
+	}
+	
 	//0 out unfillable items
 	void clean(const Layer* base)
 	{
@@ -107,16 +248,14 @@ public:
 			//Variable for each Unit comes back true if one item in Unit is already a 1
 				if (this->rows[r].Data[i]->data == 1)
 					row = true;
-				//0 out items that already have a value in base layer
-				if (base->rows[r].Data[i]->data != 0 && base->rows[r].Data[i]->data != this->identifier)
-					this->rows[r].Data[i]->data = 0;
-				
 				if (this->columns[r].Data[i]->data == 1)
 					column = true;
-				
 				if (this->blocks[r].Data[i]->data == 1)
 					block = true;
 				
+				//0 out items that already have a value in base layer
+				if (base->rows[r].Data[i]->data != 0 && base->rows[r].Data[i]->data != this->identifier)
+					this->rows[r].Data[i]->data = 0;
 			}
 			
 			if (row)
@@ -475,7 +614,26 @@ public:
 	}
 	void print_base()
 	{
-		this->base->print();
+		for (int i = 0; i<=8; i++) {
+			for (int j = 0; j<=8; j++)
+			{
+				if (j == 0)
+					cout << " "; 
+				if (this->base->rows[i].Data[j]->data == 0) 
+					cout << " ";
+				else
+					cout << this->base->rows[i].Data[j]->data;
+				
+				if (j == 2 || j == 5)
+					cout << " | ";
+				else cout << " ";
+				
+			}
+			cout << endl;
+			if (i == 2 || i == 5)
+				cout << "-----------------------" << endl;
+		}
+		cout << endl;
 	}
 	//Writes all Layers to file with formating
 	void write_all()
@@ -560,40 +718,44 @@ public:
 		
 		while (boardsum != this->sum())
 		{
-			boardsum = this->sum();
-			this->uns2();
-			this->populate();
-			this->fill_all();
+			while (boardsum != this->sum())
+			{
+				boardsum = this->sum();
+				this->uns();
+				this->populate();
+				this->fill_all();
+			}
 			
-			print_base();
-			cout << endl;
+			for (int i = 1; i <= 9; i++)
+				this->layers[i]->block_reserve();
+			this->fill_all();
+			this->populate();
+			this->uns();
+			this->fill_all();
 		}
 		
-		if (this->sum() != 405)
+		if (this->sum()!=405)
 		{
-			cout << "Unable to solve with current methods" << endl;
+			cout << endl;
+			this->print_base();
+			cout << "Unable to solve with current methods" << endl << endl;
 		}
 		
+		else
+		{
+			cout << endl << "Solved! Written to file: 0.txt" << endl << endl;
+			this->base->write();
+		}
 	}
 }; //End Board
 
 
 int main()
 {
-	Board main("sudoku2.txt");
+	Board main("sudoku3.txt");
 	
-	main.extrapolate();
-	main.fill_all();
+	main.solve();
 	
-	for (int i = 0; i<50; i++)
-	{
-		main.uns();
-		main.populate();
-		main.fill_all();
-	}
-	
-	main.print_all();
-	main.write_all();
 }
 
 
