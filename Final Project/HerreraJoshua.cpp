@@ -718,20 +718,14 @@ public:
 		
 		while (boardsum != this->sum())
 		{
-			while (boardsum != this->sum())
-			{
-				boardsum = this->sum();
-				this->uns();
-				this->populate();
-				this->fill_all();
-			}
-			
+			boardsum = this->sum();
+			this->uns();
+			this->populate();
+			this->fill_all();
 			for (int i = 1; i <= 9; i++)
 				this->layers[i]->block_reserve();
 			this->fill_all();
 			this->populate();
-			this->uns();
-			this->fill_all();
 		}
 		
 		if (this->sum()!=405)
@@ -752,7 +746,7 @@ public:
 
 int main()
 {
-	Board main("sudoku3.txt");
+	Board main("sudoku1.txt");
 	
 	main.solve();
 	
