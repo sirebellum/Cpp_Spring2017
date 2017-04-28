@@ -42,15 +42,16 @@ public:
 		for (int r = 0; r <= 8; r++) {
 			for (int i = 0; i <= 8; i++)
 			{
-				if (base->rows[r].Data[i]->data == this->identifier)
+				if (base->rows[r].Data[i]->data == this->identifier) 
 				//Rows
 					this->rows[r].Data[i]->data = 1;
-				
+
+
 			//Next code block links column Units' items and block Units' items to corresponding items in row Units
-				//Columns
+				//Columns. Easy to link, just switch indices
 				this->columns[i].link(r, this->rows[r].Data[i]);
 				
-				//Blocks
+				//Blocks. Harder to link. If else logic to determine which block to fill based on current row indices
 				if (r <= 2)
 				{
 					if (i <= 2)
@@ -158,7 +159,6 @@ public:
 	//Finds blocks whose empty items are aligned in a row or a column and 0s out the row/column outside of the block
 	void block_reserve()
 	{
-		//0s out items in which a 1 would render a block all 0s
 		int bsum = 0;
 		int brsum = 0;
 		int bc1sum = 0;
@@ -166,13 +166,15 @@ public:
 		int bc3sum = 0;
 		for (int b = 0; b <= 8; b++) {
 			for (int i = 0; i <= 8; i++)
+				//block sum to see how many -1s in a block
 				bsum+= this->blocks[b].Data[i]->data;
 			
+			//Should be no more than 3 -1s
 			if (bsum >= -3 && bsum != 1)
 			{
 				for (int i = 0; i <= 8; i++)
 				{
-					//Rows
+					//Rows. If all -1s are in the same row, should clean the rest of the row
 					brsum+= this->blocks[b].Data[i]->data;
 					if (i==2 || i==5 || i==8)
 					{
@@ -181,7 +183,7 @@ public:
 						brsum = 0;
 					}
 					
-					//Columns
+					//Columns. If all -1s are in the same column, should clean the rest of the column
 					if (i==0 || i==3 || i==6)
 					{
 						bc1sum+= this->blocks[b].Data[i]->data;
@@ -344,7 +346,7 @@ public:
 		{
 			for (int i = 0; i <= 8; i++)
 				row+= this->rows[r].Data[i]->data;
-			if (row == -1) {
+			if (row == -1) { //If there's only one -1 in row, must be a 1. Same applies for columns and blocks
 				filled = 1;
 				for (int i = 0; i <= 8; i++)
 					if (this->rows[r].Data[i]->data == -1)
@@ -382,7 +384,7 @@ public:
 		return filled;
 	}
 	
-	//Functions that are called when base isn't fully populated, but there are still unknowns. Returns index number of reservable items
+	//Functions that are called to reserve spots for layers with matching units. Returns index number of reservable items
 	int find_buns(Layer* _layer)
 	{
 		int blocksum = 0;
@@ -436,7 +438,7 @@ public:
 		return -1;
 	}
 	
-	//Function that compares Units to see if they are missing the same items
+	//Functions that compare Units to see if they are missing the same items
 	int compare_buns(int block, Layer* _layer)
 	{
 		for (int i = 0; i <= 8; i++)
@@ -459,7 +461,7 @@ public:
 		return 1;
 	}
 	
-	//Function that 0s out reservable items based on index from find_buns
+	//Functions that 0 out reservable items based on index from find_uns
 	int big_buns(int block, Layer* _layer)
 	{
 		if (block == -1) return 0;
@@ -569,24 +571,10 @@ public:
 	//Extrapolate base layer into layers 1-9
 	void extrapolate()
 	{
-		l1->populate(base);
-		l2->populate(base);
-		l3->populate(base);
-		l4->populate(base);
-		l5->populate(base);
-		l6->populate(base);
-		l7->populate(base);
-		l8->populate(base);
-		l9->populate(base);
-		l1->clean(base);
-		l2->clean(base);
-		l3->clean(base);
-		l4->clean(base);
-		l5->clean(base);
-		l6->clean(base);
-		l7->clean(base);
-		l8->clean(base);
-		l9->clean(base);
+		for (int i = 1; i <= 9; i++)
+			layers[i]->populate(base);
+		for (int i = 1; i <= 9; i++)
+			layers[i]->clean(base);
 	}
 	
 	//Prints all Layers with formating
@@ -649,30 +637,16 @@ public:
 		while (filled)
 		{
 			filled = 0;
-			filled+= this->l1->fill(base);
-			filled+= this->l2->fill(base);
-			filled+= this->l3->fill(base);
-			filled+= this->l4->fill(base);
-			filled+= this->l5->fill(base);
-			filled+= this->l6->fill(base);
-			filled+= this->l7->fill(base);
-			filled+= this->l8->fill(base);
-			filled+= this->l9->fill(base);
+			for (int i = 1; i <= 9; i++)
+				filled+= layers[i]->fill(base);
 		}
 	}
 	
 	//Populates base board
 	void populate()
 	{
-		this->base->populate_base(l1);
-		this->base->populate_base(l2);
-		this->base->populate_base(l3);
-		this->base->populate_base(l4);
-		this->base->populate_base(l5);
-		this->base->populate_base(l6);
-		this->base->populate_base(l7);
-		this->base->populate_base(l8);
-		this->base->populate_base(l9);
+		for (int i = 1; i <= 9; i++)
+			this->base->populate_base(layers[i]);
 	}
 
 	//Finds and reserves unkowns (uns) that can't be determined with simple methods
@@ -751,19 +725,3 @@ int main()
 	main.solve();
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
