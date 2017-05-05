@@ -35,24 +35,21 @@ input operator- (input foo, char bar[])
 	{
 		input nfoo;
 		int j = 0;
-		for (int i = 0; foo.thing1[i]!='\0'; i++)
+		int i = 0;
+		for (i; foo.thing1[i+j]!='\0'; i++)
 		{
-			if (i == found)
-			{
-				j = found;
-				while (foo.thing1[i] != ' ' || foo.thing1[i] != '\0')
-					i++;
-			}
-			else
+			if (i != found)
 				nfoo.thing1[i] = foo.thing1[i+j];
+			else
+				while (foo.thing1[i+j] != ' ')
+					j++;
 		}
-		nfoo.thing1[0] = '1';
+		nfoo.thing1[i] = '\0';
 		return nfoo;
 	}
 	
 	else
 	{
-		foo.thing1[0] = '0';
 		return foo;
 	}
 }
