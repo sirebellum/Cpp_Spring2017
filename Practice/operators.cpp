@@ -18,13 +18,16 @@ input operator- (input foo, char bar[])
 		{
 			for (int j = 1; bar[j]!='\0'; j++)
 			{
-				if (foo.thing1[i+j] != bar[j] && (foo.thing1[i+j] == ' ' || foo.thing1[i+j] == '\0'))
+				if (foo.thing1[i+j] != bar[j])
 				{
-						found = i;
+					found = 0;
+					break;
 				}
+				else
+					found = i;
 			}
 		}
-		if (found)
+		if (found != 0)
 			break;
 	}
 	
@@ -41,7 +44,7 @@ input operator- (input foo, char bar[])
 					i++;
 			}
 			else
-				nfoo.thing1[i] + foo.thing1[i+j];
+				nfoo.thing1[i] = foo.thing1[i+j];
 		}
 		nfoo.thing1[0] = '1';
 		return nfoo;
